@@ -22,7 +22,8 @@ public class Action implements CommandExecutor {
         if(!COMM.equals(label)){
             return false;
         }
-        log.error("hello world");
+        log.error("hello world %highlight(%-5level)");
+        log.info("sender : " + sender.getName());
         return true;
     }
 }

@@ -1,6 +1,9 @@
 package luhua.site;
 
+
+import luhua.site.httpServer.NettyServerHttp;
 import luhua.site.protocol.Action;
+import luhua.site.util.Pool;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
@@ -15,6 +18,7 @@ import org.slf4j.Logger;
 public final class Application extends JavaPlugin {
 
     private static Logger log;
+    private static final int HTTP_PORT = 80;
 
     public Application(){
         log = getSLF4JLogger();
@@ -30,6 +34,10 @@ public final class Application extends JavaPlugin {
     @Override
     public void onEnable() {
         log.info("lhdream Plugin startup logic");
+
+        log.info("start http server , port:{}",HTTP_PORT);
+        Pool.getThreadPool().execute(new NettyServerHttp(HTTP_PORT));
+
         PluginCommand command = this.getCommand("hello");
         command.setExecutor(new Action());
     }
