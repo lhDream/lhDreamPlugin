@@ -1,0 +1,9 @@
+name: lhDream
+version: '1.0'
+main: luhua.site.Application
+api-version: 1.17
+
+commands:
+  hello:
+    description: Send a hello message
+    usage: use /hello
