@@ -18,7 +18,7 @@ public class HttpLhDreamRequestMap {
      * @param httpController
      * @return
      */
-    public HttpControllerBase put(String path,HttpControllerBase httpController){
+    public static HttpControllerBase put(String path,HttpControllerBase httpController){
         return map.put(path,httpController);
     }
 

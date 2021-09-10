@@ -74,8 +74,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                 httpResponse(ctx,"/index.html");
             }else if(null != HttpLhDreamRequestMap.getHttpController(uri)){
                 HttpLhDreamRequestMap.getHttpController(uri).httpRequest(ctx,msg);
-            }else if("/plugins".equals(uri)){
-
             }else{
                 //资源文件请求
                 httpResponse(ctx,uri);

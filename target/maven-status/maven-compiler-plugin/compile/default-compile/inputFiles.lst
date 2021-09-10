@@ -1,8 +1,11 @@
+D:\github\lhDreamPlugin\src\main\java\luhua\site\httpServer\HttpLhDreamRequestMap.java
 D:\github\lhDreamPlugin\src\main\java\luhua\site\util\Pool.java
+D:\github\lhDreamPlugin\src\main\java\luhua\site\controller\PluginsController.java
 D:\github\lhDreamPlugin\src\main\java\luhua\site\util\Path.java
 D:\github\lhDreamPlugin\src\main\java\luhua\site\util\Driver.java
 D:\github\lhDreamPlugin\src\main\java\luhua\site\httpServer\HttpServerHandler.java
 D:\github\lhDreamPlugin\src\main\java\luhua\site\Application.java
+D:\github\lhDreamPlugin\src\main\java\luhua\site\httpServer\HttpControllerBase.java
 D:\github\lhDreamPlugin\src\main\java\luhua\site\httpServer\NettyServerHttp.java
 D:\github\lhDreamPlugin\src\main\java\luhua\site\util\ConfigReader.java
 D:\github\lhDreamPlugin\src\main\java\luhua\site\protocol\Action.java

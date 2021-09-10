@@ -1,6 +1,8 @@
 package luhua.site;
 
 
+import luhua.site.controller.PluginsController;
+import luhua.site.httpServer.HttpLhDreamRequestMap;
 import luhua.site.httpServer.NettyServerHttp;
 import luhua.site.protocol.Action;
 import luhua.site.util.ConfigReader;
@@ -90,6 +92,7 @@ public final class Application extends JavaPlugin {
                 HTTP_PORT = config.getInt("lhDream.httpServer.port");
                 log.info("start http server , port:{}",HTTP_PORT);
                 Pool.getThreadPool().execute(new NettyServerHttp(HTTP_PORT));
+                HttpLhDreamRequestMap.put("/plugins",new PluginsController());
             } catch (Exception e) {
                 log.error("获取http port 失败");
                 log.error(e.getLocalizedMessage());
