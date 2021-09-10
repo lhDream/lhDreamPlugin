@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>lhDream插件配置</title>
 </head>
 <body>
-    <!-- <button id="sel">查询服务器安装插件</button> -->
+    <button id="sel">查询</button>
     <div id = "text"></div>
 </body>
-<script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
+<!--<script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>-->
+<script type="text/javascript" src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.5.1.min.js"></script>
 <script type="text/javascript" >
-    $("#sel").click(function(){
-        $("#text").text("123456");
+
+    $("button").click(function (){
+        $("#text").load("/plugins");
     });
-    $("#text").load("plugins");
 </script>
 </html>

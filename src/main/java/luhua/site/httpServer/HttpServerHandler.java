@@ -12,6 +12,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 
+import static io.netty.handler.codec.http.HttpHeaderNames.*;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
@@ -61,12 +63,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
-        String method = msg.method().name();
         String uri = msg.uri();
         if (favicon.equals(uri)) {
             return;
         }
-
         if(msg.method() == HttpMethod.GET){
             //GET请求
             if("".equals(uri) || INDEX.equals(uri)){
@@ -111,11 +111,17 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                 head.append(String.format("<base href=\"http://%s\">",serverAddress));
                 jarFile = doc.html().getBytes(StandardCharsets.UTF_8);
             }
-            DefaultFullHttpResponse defaultFullHttpResponse =
+            DefaultFullHttpResponse response =
                     new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
                             HttpResponseStatus.OK,
                             Unpooled.copiedBuffer(jarFile,0,jarFile.length));
-            ctx.writeAndFlush(defaultFullHttpResponse);
+
+            response.headers().set("Content_Length", response.content().readableBytes());
+            //允许跨域访问
+            response.headers().set( ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+            response.headers().set( ACCESS_CONTROL_ALLOW_HEADERS, "Origin, X-Requested-With, Content-Type, Accept");
+            response.headers().set( ACCESS_CONTROL_ALLOW_METHODS, "GET, POST, PUT,DELETE");
+            ctx.writeAndFlush(response);
             ctx.close();
         }catch(Exception e){
             log.error(e.getLocalizedMessage());
@@ -141,6 +147,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         while ((len=ins.read(str_b)) > 0) {
             outbursts.write(str_b,0,len);
         }
+        ins.close();
         return outbursts.toByteArray();
     }
 
