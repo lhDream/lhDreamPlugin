@@ -7,6 +7,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
+import io.netty.handler.stream.ChunkedWriteHandler;
+import luhua.site.Application;
 
 /**
  * @description: HTTP服务
@@ -58,10 +60,11 @@ public class NettyServerHttp extends Thread{
                         @Override
                         protected void initChannel(Channel ch) throws Exception {
                             ch.pipeline()
-                                    .addLast(new HttpRequestDecoder())
-                                    .addLast(new HttpObjectAggregator(MAX_LEN))
-                                    .addLast(new HttpServerHandler())
-                                    .addLast(new HttpResponseEncoder());
+                                    .addLast("http-decoder",new HttpRequestDecoder())
+                                    .addLast("http-aggregator",new HttpObjectAggregator(MAX_LEN))
+                                    .addLast("http-encoder",new HttpResponseEncoder())
+                                    .addLast("http-chunked",new ChunkedWriteHandler())
+                                    .addLast("http-server",new HttpServerHandler());
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
@@ -74,6 +77,7 @@ public class NettyServerHttp extends Thread{
             future.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
+            Application.getLog().error(e.getLocalizedMessage());
         }finally {
             boss.shutdownGracefully();
             work.shutdownGracefully();

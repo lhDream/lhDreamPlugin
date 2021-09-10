@@ -1,0 +1,11 @@
+lhDream:
+  #数据库配置
+  database:
+    driver-class-name: "com.mysql.jdbc.Driver"
+    url: "jdbc:mysql://localhost:3306/lhDream?characterEncoding=utf8"
+    username: "root"
+    password: "123456"
+  #http服务配置
+  httpServer:
+    ip: 127.0.0.1
+    port: 80

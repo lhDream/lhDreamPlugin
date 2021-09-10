@@ -3,6 +3,7 @@ package luhua.site.protocol;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.Command;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +23,16 @@ public class Action implements CommandExecutor {
         if(!COMM.equals(label)){
             return false;
         }
-        log.error("hello world %highlight(%-5level)");
-        log.info("sender : " + sender.getName());
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            log.error("hello world %highlight(%-5level)");
+            log.info("sender : " + sender.getName());
+        } else {
+            sender.sendMessage("You must be a player!");
+            return false;
+        }
         return true;
     }
+
+
 }

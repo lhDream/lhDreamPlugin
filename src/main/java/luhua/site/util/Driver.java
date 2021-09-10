@@ -3,6 +3,7 @@ package luhua.site.util;
 import luhua.site.Application;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 
 /**
  * @description: 数据库驱动
@@ -32,8 +33,14 @@ public class Driver {
      */
     private static Connection con;
 
+    private static Driver driver;
+
+    public static void init(){
+
+    }
+
     /**
-     * @description: 初始化数据库驱动
+     * @description: 构造数据库驱动
      * @author: lhDream
      * @create: 2021-09-08 17:15
      **/
@@ -49,6 +56,13 @@ public class Driver {
             Application.getLog().error("database driver init error.");
             Application.getLog().error(e.getLocalizedMessage());
         }
+    }
+
+    public static Connection getCon() throws Exception{
+        if(null == con || con.isClosed()){
+
+        }
+        return null;
     }
 
 }

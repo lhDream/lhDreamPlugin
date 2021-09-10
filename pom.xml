@@ -81,5 +81,11 @@
             <artifactId>netty-all</artifactId>
             <version>4.1.67.Final</version>
         </dependency>
+        <!-- jsoup -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.14.2</version>
+        </dependency>
     </dependencies>
 </project>
