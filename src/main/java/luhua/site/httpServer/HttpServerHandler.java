@@ -74,6 +74,11 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             ctx.close();
             return;
         }
+        //参数标识
+        char _paramFlag = '?';
+        if(uri.indexOf(_paramFlag)>-1){
+            uri = uri.substring(0,uri.indexOf(_paramFlag));
+        }
         if(msg.method() == HttpMethod.GET){
             //GET请求
             if("".equals(uri) || INDEX.equals(uri)){
