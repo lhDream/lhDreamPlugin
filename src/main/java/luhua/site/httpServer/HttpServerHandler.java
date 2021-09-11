@@ -141,17 +141,22 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             response.headers().set( ACCESS_CONTROL_ALLOW_HEADERS, "Origin, X-Requested-With, Content-Type, Accept");
             response.headers().set( ACCESS_CONTROL_ALLOW_METHODS, "GET, POST, PUT,DELETE");
 
-            ctx.writeAndFlush(response).addListener((e)->{
+            ChannelFuture channelFuture = ctx.writeAndFlush(response);
+            channelFuture.addListener((e)->{
                 if(e.isSuccess()){
                     ctx.close();
                 }
             });
+            if(channelFuture.isSuccess()){
+                ctx.close();
+            }
         }catch(Exception e){
             log.error(e.getLocalizedMessage());
             DefaultFullHttpResponse defaultFullHttpResponse =
                     new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
                             HttpResponseStatus.NOT_FOUND);
             ctx.writeAndFlush(defaultFullHttpResponse);
+            ctx.close();
         }
     }
 
