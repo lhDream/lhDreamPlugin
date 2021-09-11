@@ -24,7 +24,7 @@ import java.util.Collection;
 public class PluginsController implements HttpControllerBase {
 
     @Override
-    public void httpRequest(ChannelHandlerContext ctx, FullHttpRequest msg) {
+    public DefaultFullHttpResponse httpRequest(ChannelHandlerContext ctx, FullHttpRequest msg) {
         byte[] b;
         StringBuilder sb = new StringBuilder();
         @NotNull Plugin[] plugins = Application.getApplication().getServer().getPluginManager().getPlugins();
@@ -48,8 +48,7 @@ public class PluginsController implements HttpControllerBase {
                 new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
                         HttpResponseStatus.OK,
                         Unpooled.copiedBuffer(b,0,b.length));
-        ctx.writeAndFlush(defaultFullHttpResponse);
-        ctx.close();
+        return defaultFullHttpResponse;
     }
 
 }

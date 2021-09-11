@@ -1,6 +1,7 @@
 package luhua.site.httpServer;
 
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 
 /**
@@ -11,6 +12,6 @@ import io.netty.handler.codec.http.FullHttpRequest;
  */
 public interface HttpControllerBase {
 
-    void httpRequest(ChannelHandlerContext ctx, FullHttpRequest msg);
+    DefaultFullHttpResponse httpRequest(ChannelHandlerContext ctx, FullHttpRequest msg);
 
 }

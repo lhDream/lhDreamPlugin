@@ -1,6 +1,7 @@
 package luhua.site.httpServer;
 
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
@@ -37,6 +38,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
      * html后缀
      */
     private static final String HTML = ".html";
+
+    public static final String CONNECTION = "Connection";
+
+    public static String KEEP_LIVE = "keeplive";
     /**
      * 服务器ip
      */
@@ -65,6 +70,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
         String uri = msg.uri();
         if (favicon.equals(uri)) {
+            ctx.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,HttpResponseStatus.OK));
+            ctx.close();
             return;
         }
         if(msg.method() == HttpMethod.GET){
@@ -73,7 +80,19 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                 //首页
                 httpResponse(ctx,"/index.html");
             }else if(null != HttpLhDreamRequestMap.getHttpController(uri)){
-                HttpLhDreamRequestMap.getHttpController(uri).httpRequest(ctx,msg);
+                DefaultFullHttpResponse defaultFullHttpResponse = HttpLhDreamRequestMap.getHttpController(uri).httpRequest(ctx, msg);
+                if(null != defaultFullHttpResponse){
+                    ChannelFuture channelFuture = ctx.writeAndFlush(defaultFullHttpResponse);
+                    if(!KEEP_LIVE.equals(defaultFullHttpResponse.headers().get(CONNECTION))){
+                        channelFuture.addListener(e->{
+                            if(e.isSuccess()){
+                                ctx.close();
+                            }
+                        });
+                    }
+                }else{
+                    ctx.close();
+                }
             }else{
                 //资源文件请求
                 httpResponse(ctx,uri);
@@ -105,31 +124,34 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         try{
             String url = "html"+filename;
             byte[] jarFile = this.getJarFile(url);
+            DefaultFullHttpResponse response;
             if(filename.indexOf(HTML) > -1){
                 Document doc = Jsoup.parse(new String(jarFile), "UTF-8");
                 Elements head = doc.getElementsByTag("head");
                 head.append(String.format("<base href=\"http://%s\">",serverAddress));
                 jarFile = doc.html().getBytes(StandardCharsets.UTF_8);
             }
-            DefaultFullHttpResponse response =
-                    new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
-                            HttpResponseStatus.OK,
-                            Unpooled.copiedBuffer(jarFile,0,jarFile.length));
-
+            response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
+                    HttpResponseStatus.OK,
+                    Unpooled.copiedBuffer(jarFile,0,jarFile.length));
+            response.headers().set("Connection","Close");
             response.headers().set("Content_Length", response.content().readableBytes());
             //允许跨域访问
             response.headers().set( ACCESS_CONTROL_ALLOW_ORIGIN, "*");
             response.headers().set( ACCESS_CONTROL_ALLOW_HEADERS, "Origin, X-Requested-With, Content-Type, Accept");
             response.headers().set( ACCESS_CONTROL_ALLOW_METHODS, "GET, POST, PUT,DELETE");
-            ctx.writeAndFlush(response);
-            ctx.close();
+
+            ctx.writeAndFlush(response).addListener((e)->{
+                if(e.isSuccess()){
+                    ctx.close();
+                }
+            });
         }catch(Exception e){
             log.error(e.getLocalizedMessage());
             DefaultFullHttpResponse defaultFullHttpResponse =
                     new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
                             HttpResponseStatus.NOT_FOUND);
             ctx.writeAndFlush(defaultFullHttpResponse);
-            ctx.close();
         }
     }
 
@@ -149,6 +171,12 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         }
         ins.close();
         return outbursts.toByteArray();
+    }
+
+    @Override
+    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+        super.handlerRemoved(ctx);
+        ctx.close();
     }
 
 }

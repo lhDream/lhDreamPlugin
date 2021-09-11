@@ -24,7 +24,7 @@ public class NettyServerHttp extends Thread{
     /**
      * http缓存最大值
      */
-    private static final int MAX_LEN = 20*1024*1024;
+    private static final int MAX_LEN = 100*1024*1024;
 
     /**
      * @description: HTTP服务初始化
