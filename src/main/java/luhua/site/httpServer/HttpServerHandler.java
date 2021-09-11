@@ -2,6 +2,7 @@ package luhua.site.httpServer;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
@@ -83,17 +84,13 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
             //GET请求
             if("".equals(uri) || INDEX.equals(uri)){
                 //首页
-                httpResponse(ctx,"/index.html");
+                httpResponse(ctx,"/login.html");
             }else if(null != HttpLhDreamRequestMap.getHttpController(uri)){
                 DefaultFullHttpResponse defaultFullHttpResponse = HttpLhDreamRequestMap.getHttpController(uri).httpRequest(ctx, msg);
                 if(null != defaultFullHttpResponse){
                     ChannelFuture channelFuture = ctx.writeAndFlush(defaultFullHttpResponse);
                     if(!KEEP_LIVE.equals(defaultFullHttpResponse.headers().get(CONNECTION))){
-                        channelFuture.addListener(e->{
-                            if(e.isSuccess()){
-                                ctx.close();
-                            }
-                        });
+                        channelFuture.addListener(ChannelFutureListener.CLOSE);
                     }
                 }else{
                     ctx.close();
@@ -105,6 +102,8 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         }else if(msg.method() == HttpMethod.POST){
             //POST请求
 
+
+            ctx.close();
         }
     }
 
