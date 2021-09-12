@@ -6,6 +6,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.multipart.*;
 import luhua.site.Application;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -18,6 +19,10 @@ import static io.netty.handler.codec.http.HttpHeaderNames.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -26,6 +31,9 @@ import java.nio.charset.StandardCharsets;
  * @create: 2021-09-09 09:49
  **/
 public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
+
+    private static final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE); //Disk
+    private HttpPostRequestDecoder decoder;
 
     /**
      * http根目录、首页
@@ -39,6 +47,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
      * html后缀
      */
     private static final String HTML = ".html";
+    /**
+     * logo后缀
+     */
+    private static final String ICO = ".ico";
 
     public static final String CONNECTION = "Connection";
 
@@ -69,40 +81,101 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) throws Exception {
-        String uri = msg.uri();
-        if (favicon.equals(uri)) {
-            ctx.writeAndFlush(new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,HttpResponseStatus.OK));
-            ctx.close();
-            return;
-        }
-        //参数标识
-        char _paramFlag = '?';
-        if(uri.indexOf(_paramFlag)>-1){
-            uri = uri.substring(0,uri.indexOf(_paramFlag));
-        }
-        if(msg.method() == HttpMethod.GET){
-            //GET请求
-            if("".equals(uri) || INDEX.equals(uri)){
-                //首页
-                httpResponse(ctx,"/login.html");
-            }else if(null != HttpLhDreamRequestMap.getHttpController(uri)){
-                DefaultFullHttpResponse defaultFullHttpResponse = HttpLhDreamRequestMap.getHttpController(uri).httpRequest(ctx, msg);
-                if(null != defaultFullHttpResponse){
-                    ChannelFuture channelFuture = ctx.writeAndFlush(defaultFullHttpResponse);
-                    if(!KEEP_LIVE.equals(defaultFullHttpResponse.headers().get(CONNECTION))){
-                        channelFuture.addListener(ChannelFutureListener.CLOSE);
-                    }
+        try{
+            String uri = msg.uri();
+            DefaultFullHttpResponse resp = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,HttpResponseStatus.OK);
+
+            if(HttpMethod.GET == msg.method()){
+                //参数标识
+                QueryStringDecoder qsd = new QueryStringDecoder(msg.uri());
+                uri = qsd.path();
+
+                //GET请求
+                if("".equals(uri) || INDEX.equals(uri)){
+                    //首页
+                    httpResponse(ctx,"/login.html");
+                }else if(null != HttpLhDreamRequestMap.getHttpController(uri)){
+                    //获取get请求参数
+                    Map<String, List<String>> param = qsd.parameters();
+                    defaultResponse(ctx, msg, uri, resp, param);
                 }else{
+                    //资源文件请求
+                    httpResponse(ctx,uri);
+                }
+            }else if(HttpMethod.POST == msg.method()){
+                if(null != HttpLhDreamRequestMap.getHttpController(uri)){
+                    //获取post请求参数
+                    decoder = new HttpPostRequestDecoder(factory, msg);
+                    Map<String,List<String>> map = new HashMap<>();
+                    List<InterfaceHttpData> bodyHttpDatas = decoder.getBodyHttpDatas();
+                    if(null != bodyHttpDatas){
+                        bodyHttpDatas.forEach(e->{
+                            if(null == e){
+                                return;
+                            }
+                            if (e.getHttpDataType() == InterfaceHttpData.HttpDataType.Attribute) {
+                                Attribute attribute = (Attribute) e;
+                                String question = null;
+                                try {
+                                    List<String> strings = map.get(e.getName());
+                                    if(strings == null){
+                                        strings = new ArrayList<>();
+                                        map.put(e.getName(),strings);
+                                    }
+                                    strings.add(attribute.getValue());
+                                } catch (IOException ioException) {
+                                    ioException.printStackTrace();
+                                    log.error(ioException.toString());
+                                }
+                            }
+                        });
+                    }
+                    defaultResponse(ctx, msg, uri, resp, map);
+                }else{
+                    DefaultFullHttpResponse defaultFullHttpResponse =
+                            new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
+                                    HttpResponseStatus.NOT_FOUND);
+                    ctx.writeAndFlush(defaultFullHttpResponse).addListener(ChannelFutureListener.CLOSE);
                     ctx.close();
                 }
             }else{
-                //资源文件请求
-                httpResponse(ctx,uri);
+                log.info("不支持的请求方式");
+                DefaultFullHttpResponse defaultFullHttpResponse =
+                        new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
+                                HttpResponseStatus.INTERNAL_SERVER_ERROR);
+                ctx.writeAndFlush(defaultFullHttpResponse).addListener(ChannelFutureListener.CLOSE);
             }
-        }else if(msg.method() == HttpMethod.POST){
-            //POST请求
 
+        }catch(Exception e){
+            DefaultFullHttpResponse defaultFullHttpResponse =
+                    new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
+                            HttpResponseStatus.INTERNAL_SERVER_ERROR);
+            ctx.writeAndFlush(defaultFullHttpResponse).addListener(ChannelFutureListener.CLOSE);
+        }
+    }
 
+    /**
+     * 默认http响应
+     * @param ctx
+     * @param msg
+     * @param uri
+     * @param resp
+     * @param param
+     */
+    private void defaultResponse(ChannelHandlerContext ctx, FullHttpRequest msg, String uri, DefaultFullHttpResponse resp, Map<String, List<String>> param) {
+        //debug日志
+//        log.info("param: {}",param);
+        DefaultFullHttpResponse defaultFullHttpResponse = HttpLhDreamRequestMap.getHttpController(uri).httpRequest(ctx, msg,resp,param);
+        if(null != defaultFullHttpResponse){
+            ChannelFuture channelFuture = ctx.writeAndFlush(defaultFullHttpResponse);
+            if(!KEEP_LIVE.equals(defaultFullHttpResponse.headers().get(CONNECTION))){
+                channelFuture.addListener(ChannelFutureListener.CLOSE);
+            }
+        }else{
+            defaultFullHttpResponse =
+                    new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
+                            HttpResponseStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
+            ctx.writeAndFlush(defaultFullHttpResponse).addListener(ChannelFutureListener.CLOSE);
             ctx.close();
         }
     }
@@ -128,16 +201,18 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         try{
             String url = "html"+filename;
             byte[] jarFile = this.getJarFile(url);
-            DefaultFullHttpResponse response;
+            DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
+                    HttpResponseStatus.OK);;
             if(filename.indexOf(HTML) > -1){
                 Document doc = Jsoup.parse(new String(jarFile), "UTF-8");
                 Elements head = doc.getElementsByTag("head");
                 head.append(String.format("<base href=\"http://%s\">",serverAddress));
                 jarFile = doc.html().getBytes(StandardCharsets.UTF_8);
+            }else if(filename.indexOf(ICO) > -1){
+                response.headers().set("content-type","image/vnd.microsoft.icon");
             }
-            response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
-                    HttpResponseStatus.OK,
-                    Unpooled.copiedBuffer(jarFile,0,jarFile.length));
+
+            response.content().writeBytes(jarFile);
             response.headers().set("Connection","Close");
             response.headers().set("Content_Length", response.content().readableBytes());
             //允许跨域访问
@@ -155,7 +230,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                 ctx.close();
             }
         }catch(Exception e){
-            log.error(e.getLocalizedMessage());
+            log.error("http requets error,{}",e.getLocalizedMessage());
             DefaultFullHttpResponse defaultFullHttpResponse =
                     new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
                             HttpResponseStatus.NOT_FOUND);

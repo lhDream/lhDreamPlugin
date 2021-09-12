@@ -12,11 +12,11 @@
 </head>
 <body>
 <div jepane="top" class="je-admin-top">
-    <div class="je-admin-logo je-tc je-fl je-white" title="JEUI"></div>
+    <div class="je-admin-logo je-tc je-fl je-white" title="lhDream"></div>
     <div class="shrink je-fl je-white je-icon je-f28 je-mr10">&#xe626;</div>
     <div class="je-admin-navs je-fl">
-        <ul class="je-ovh je-dib" id="myTabNav">
-            <li class="curr"><em><img src="images/setico.png"></em><p>系统管理</p></li>
+        <ul class="je-ovh je-dib je-tabs-title" id="myTabNav">
+            <li class="curr on"><em><img src="images/setico.png"></em><p>首页</p></li>
 <!--            <li><em><img src="images/actico.png"></em><p>活动管理</p></li>-->
 <!--            <li><em><img src="images/spico.png"></em><p>商品管理</p></li>-->
 <!--            <li><em><img src="images/ddico.png"></em><p>订单管理</p></li>-->
@@ -27,47 +27,57 @@
     </div>
     <div class="je-admin-user je-fr">
         <span class="photo je-fl"><img src="images/photo.png"></span>
-        <div class="usertext je-pl8 je-fl je-f14 je-pr30">administrator</div>
-        <!--<p>XXX,欢迎您使用平台</p>
-        <p class="je-tr"><a href="javascript:void(0);" class="exit">退出账户</a></p>-->
+        <div class="usertext je-pl8 je-fl je-f14 je-pr30">root</div>
+<!--        <p>XXX,欢迎您使用平台</p>-->
+<!--        <p class="je-tr"><a href="javascript:void(0);" class="exit">退出账户</a></p>-->
     </div>
 </div>
 <div jepane="left" class="je-admin-left">
     <ul class="je-admin-menu">
         <li class="level">
-            <h3><em class="ico"></em>内容管理<i></i></h3>
+            <h3><em class="ico"></em>插件管理<i></i></h3>
             <ul class="levelnext">
-                <li><a href="javascript:;" data-tab="p2" data-text="文章内容列表" data-url="news-list.html" addtab>文章内容列表</a></li>
-                <li><a href="javascript:;" data-tab="p3" data-text="dataTable动态数据" data-url="news-datalist.html" addtab>dataTable动态数据</a></li>
-                <li><a href="javascript:;" data-tab="p4" data-text="tree树列表" data-url="tree.html" addtab>tree树列表</a></li>
-                <li><a href="javascript:;" data-tab="p5" data-text="Tabs选项卡" data-url="tabs.html" addtab>Tabs选项卡</a></li>
+                <!--                <li><a href="javascript:;" data-tab="p2" data-text="插件列表" data-url="news-list.html" addtab>插件列表</a></li>-->
+                <li><a href="javascript:;" data-tab="p3" data-text="插件配置" data-url="news-datalist.html" addtab>插件配置</a></li>
+                <!--                <li><a href="javascript:;" data-tab="p4" data-text="插件" data-url="tree.html" addtab>tree树列表</a></li>-->
+                <!--                <li><a href="javascript:;" data-tab="p5" data-text="Tabs选项卡" data-url="tabs.html" addtab>Tabs选项卡</a></li>-->
 
             </ul>
         </li>
         <li class="level">
-            <h3><em class="ico"></em>网站设置<i></i></h3>
+            <h3><em class="ico"></em>权限配置<i></i></h3>
             <ul class="levelnext">
-                <li><a href="javascript:;" data-tab="psy" data-text="系统设置" data-url="system.html" addtab>系统设置</a></li>
-                <li><a href="javascript:;" data-tab="log" data-text="系统日志" data-url="syslog.html" addtab>系统日志</a></li>
+                <!--                <li><a href="javascript:;" data-tab="psy" data-text="权限列表" data-url="system.html" addtab>权限列表</a></li>-->
+                <li><a href="javascript:;" data-tab="log" data-text="权限分配" data-url="syslog.html" addtab>权限分配</a></li>
             </ul>
         </li>
         <li class="level">
-            <h3><em class="ico"></em>会员管理<i></i></h3>
+            <h3><em class="ico"></em>玩家管理<i></i></h3>
             <ul class="levelnext">
-                <li><a href="javascript:;" data-tab="user" data-text="会员列表" data-url="user-list.html" addtab>会员列表</a></li>
+                <li><a href="javascript:;" data-tab="user" data-text="玩家列表" data-url="user-list.html" addtab>玩家列表</a></li>
             </ul>
         </li>
     </ul>
+
 
 </div>
 <div jepane="center" class="je-admin-center" tabpane>
 
 </div>
 <div jepane="right" class="je-admin-right">right</div>
-<div jepane="bottom" class="je-admin-bottom"><p>2017 © jayui.com MIT license</p></div>
-
+<div jepane="bottom" class="je-admin-bottom">
+    <p>2017 © jayui.com MIT license</p>
+    <p>2021 © mc.luhua.site lhDream plugin</p>
+</div>
+<script type="text/javascript" src="js/modules/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.min.js"></script>
 <script type="text/javascript">
+    let token = $.cookie("lhDream_token");
+    if(null == token || "" == token || undefined == token){
+        window.location.href = "login.html"
+    }
     jeui.use(["jquery","jeBox","jeLayout","jeTabPane","jeAccordion"],function () {
+
         //Layout面板布局
         $("body").jeLayout();
         $("#myTabNav").find("li").on("click",function () {
@@ -91,7 +101,7 @@
         $("[tabpane]").jeTabPane({
             firstItem:{                              //默认首页
                 tab: "main",
-                text: "后台首页",
+                text: "首页",
                 url: "main.html",
                 closable:false
             }

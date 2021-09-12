@@ -55,8 +55,12 @@
     </div>
     
 </div>
+<script type="text/javascript" src="js/jquery.cookie.min.js"></script>
 <script type="text/javascript">
- 
+    let token = $.cookie("lhDream_token");
+    if(null == token || "" == token || undefined == token){
+        window.location.href = "login.html"
+    }
     $("#je-panel").jeAccordion({
         itemfun:function (tit,com,isacc) {
             console.log(isacc)

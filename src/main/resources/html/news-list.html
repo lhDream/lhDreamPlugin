@@ -221,7 +221,13 @@
 
     
 </div>
+<script type="text/javascript" src="js/modules/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.min.js"></script>
 <script type="text/javascript">
+    let token = $.cookie("lhDream_token");
+    if(null == token || "" == token || undefined == token){
+        window.location.href = "login.html"
+    }
     jeui.use(["jquery","jeBox","jeDate","jeCheck","jeSelect"],function () {
 
         $("#addart").on("click",function(){

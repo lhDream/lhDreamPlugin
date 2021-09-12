@@ -15,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @description: 插件控制
@@ -24,7 +26,7 @@ import java.util.Collection;
 public class PluginsController implements HttpControllerBase {
 
     @Override
-    public DefaultFullHttpResponse httpRequest(ChannelHandlerContext ctx, FullHttpRequest msg) {
+    public DefaultFullHttpResponse httpRequest(ChannelHandlerContext ctx, FullHttpRequest req, DefaultFullHttpResponse resp, Map<String, List<String>> param) {
         byte[] b;
         StringBuilder sb = new StringBuilder();
         @NotNull Plugin[] plugins = Application.getApplication().getServer().getPluginManager().getPlugins();
@@ -50,5 +52,4 @@ public class PluginsController implements HttpControllerBase {
                         Unpooled.copiedBuffer(b,0,b.length));
         return defaultFullHttpResponse;
     }
-
 }

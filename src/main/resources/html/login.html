@@ -9,19 +9,42 @@
     <meta name="viewport" content="wcodeth=device-wcodeth, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="css/jeui.css"  media="all">
     <link rel="stylesheet" href="css/admin.css"  media="all">
+    <link rel="icon" type="image/png" sizes="64x64" href="favicon.ico"/>
 </head>
 <body class="loginbox">
     <div class="je-login"></div>
     <div class="je-logincon">
         <div class="logo"></div>
         <p class="logtext">欢迎登录lhDream插件管理系统</p>
-        <p class="je-pb10"><input class="userinp" type="text" name="user" placeholder="请输入用户名" ></p>
-        <p class="je-pb10"><input class="userinp" type="password" name="password" placeholder="请输入密码"></p>
+        <p  class="je-pb10"><input id="username" class="userinp" type="text" name="user" placeholder="请输入用户名" ></p>
+        <p  class="je-pb10"><input id="password" class="userinp" type="password" name="password" placeholder="请输入密码"></p>
         <p class="je-pt10"><input class="userbtn" type="button" value="确 认 登 录" onclick="gosys()"></p>
     </div>
+
+<script type="text/javascript" src = "js/modules/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.cookie.min.js"></script>
 <script type="text/javascript">
     function gosys() {
-        window.location.href = "index.html"
+        $.post("login",
+            {
+                username:$("#username").val(),
+                password:$("#password").val()
+            },
+            function(data,status){
+                if("success" == status){
+                    data = $.parseJSON(data);
+                    if(data.res == "success"){
+                        //将token存入缓存
+                        $.cookie("lhDream_token",data.token);
+                        $.cookie("lhDream_token_user",$("#username").val());
+                        window.location.href = "index.html"
+                    }else{
+                        alert("登录失败，用户名或密码错误");
+                    }
+                }else{
+                    alert("登录失败，网络异常。");
+                }
+            });
     }
 </script>
 </body>

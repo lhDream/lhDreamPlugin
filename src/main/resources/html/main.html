@@ -12,25 +12,6 @@
 </head>
 <body>
 <div class="je-p10">
-    <blockquote class="je-quote je-f14 je-mb20">
-        JEUI 是一款国产前端UI框架，遵循原生HTML/CSS/JS的书写与组织形式，国内很多程序员javascript不熟, 大大影响了开发速度. 因此JEUI不需要开发人员去关心javascript怎么写, 只要写标准html就可以了，门槛极低，拿来即用。其外在极简，却又不失饱满的内在，体积轻盈，组件丰盈，从核心代码到API的每一处细节都经过精心雕琢，非常适合界面的快速开发。<br/>
-        JEUI基于jQuery的UI框架，包括表单、布局、表格等等常用UI控件，使用JEUI可以快速轻松地创建风格统一的界面效果。
-        <br/><br/>
-        <div class="je-ovh" style="line-height:30px;">
-        <p class="je-fl je-mr30">1、JEUI-官网 <a href="http://www.jemui.com/" target="_blank" class="je-btn je-bg-green je-btn-small je-white je-f14">JEUI官网</a></p>
-        <p class="je-fl">2、JEUI-文档API <a href="http://www.jemui.com/uidoc/" target="_blank" class="je-btn je-bg-green je-btn-small je-white je-f14">文档API</a></p>
-        </div><br/>
-        <span class="je-mt10 je-f16 je-g3 je-ovh">浏览器兼容，下面是我们的主要兼容目标</span><br/>
-        1、IE8 或者 IE8以上 (Windows), <span class="je-red">IE8以下浏览器不兼容</span><br/>
-        2、Safari (Mac)<br/>
-        3、Chrome (Windows, Mac, Linux)<br/>
-        4、Firefox (Windows, Mac,  Linux)<br/>
-        5、谷歌内核(webkit)浏览器，如360浏览器，搜狗浏览器，QQ浏览器等<br/>
-        <span class="je-red">6、建议使用谷歌内核(webkit)浏览器，体验效果更好</span><br/>
-        你可以在 <a href="//www.jemui.com" target="_blank" class="je-blue">官网首页</a> 下载到 JEUI 的最新版，也可以通过 <a href="http://git.oschina.net/arts1986/jeui" target="_blank" class="je-blue">GitHub</a> 得到JEUI的开源包。目前只同步维护这两处资源渠道。<br/>
-        <span class="je-red">BUG 是避免不了的，需要一步步完善，希望大家多多参与！</span>
-    </blockquote>
-
     <div class="je-row-ml je-ovh je-boxsiz">
         <div class="je-wlg16 je-wmd16 je-wsm33 je-wmn50 je-fl je-pl10 je-pb10 je-boxsiz">
             <a href="javascript:;" target="_blank" class="pane-link">
@@ -112,7 +93,11 @@
     </div>
 </div>
 <script type="text/javascript">
-jeui.use(["jquery","jeTabs","echarts"],function () {
+jeui.use(["jquery","jeTabs","echarts","../jquery.cookie.min"],function () {
+    let token = $.cookie("lhDream_token");
+    if(null == token || "" == token || undefined == token){
+        window.location.href = "login.html"
+    }
     var tab = $("#je-tabs").jeTabs();
     
     $("#tadadd").on("click",function(){
