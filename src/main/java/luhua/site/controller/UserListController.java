@@ -30,6 +30,7 @@ public class UserListController implements HttpControllerBase {
             String username = param.get("username").get(0);
             String localToken = LoginController.tokens.get(username);
             if(localToken != null && localToken.equals(token)){
+
                 JSONArray jsonArray = new JSONArray();
                 @NotNull Collection<? extends Player> players = Application.getApplication().getServer().getOnlinePlayers();
                 players.forEach(e->{
@@ -37,7 +38,6 @@ public class UserListController implements HttpControllerBase {
                     player.addProperty("name",e.getName());
                     player.addProperty("state",1);
                     player.addProperty("uuid",e.getUniqueId().toString());
-
                     jsonArray.add(player);
                 });
 

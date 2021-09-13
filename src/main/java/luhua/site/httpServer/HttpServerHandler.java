@@ -226,7 +226,9 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                     ctx.close();
                 }
             });
-            if(channelFuture.isSuccess()){
+            //http响应延时处理最小长度 10000字节
+            final int HTTP_MIN_SIZE = 10000;
+            if(channelFuture.isSuccess() || response.content().readableBytes() < HTTP_MIN_SIZE){
                 ctx.close();
             }
         }catch(Exception e){

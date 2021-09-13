@@ -2,6 +2,7 @@ package luhua.site;
 
 
 import luhua.site.controller.LoginController;
+import luhua.site.controller.PlayerController;
 import luhua.site.controller.PluginsController;
 import luhua.site.controller.UserListController;
 import luhua.site.httpServer.HttpLhDreamRequestMap;
@@ -56,6 +57,7 @@ public final class Application extends JavaPlugin {
         this.saveDefaultConfig();
         this.initHttp();
 
+
         PluginCommand command = this.getCommand("hello");
         command.setExecutor(new Action());
     }
@@ -97,6 +99,8 @@ public final class Application extends JavaPlugin {
                 HttpLhDreamRequestMap.put("/plugins",new PluginsController());
                 HttpLhDreamRequestMap.put("/login",new LoginController());
                 HttpLhDreamRequestMap.put("/userList",new UserListController());
+                HttpLhDreamRequestMap.put("/playerController",new PlayerController());
+
             } catch (Exception e) {
                 log.error("获取http port 失败");
                 log.error(e.getLocalizedMessage());
