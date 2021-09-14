@@ -10,6 +10,9 @@
     <link rel="stylesheet" href="css/skin/jebox.css"  media="all">
     <link rel="stylesheet" href="css/skin/jedate.css"  media="all">
     <script type="text/javascript" src="js/modules/jeui.js"></script>
+    <script type="text/javascript" src="js/modules/jquery.js"></script>
+    <script type="text/javascript" src="js/modules/jquery.jebox.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/jquery.cookie.min.js" charset="utf-8"></script>
     <style>
         .userphoto{width: 60px;height: 60px;overflow: hidden;}
     </style>
@@ -45,7 +48,7 @@
         </tr>
         </thead>
         <tbody id="userList">
-            <tr hidden>
+            <tr >
                 <td align="center"><input type="checkbox" name="checkbox" jename="chunk"></td>
                 <td>01</td>
                 <td align="center"><img src="images/userphoto.jpg" class="userphoto"/></td>
@@ -54,16 +57,140 @@
                 <td>男</td>
                 <td align="center">
                     <button class="je-btn je-btn-mini je-f12">编辑</button>
-                    <button class="je-btn je-btn-mini je-bg-red je-f12">删除</button>
+                    <button class="je-btn je-btn-mini je-bg-red je-f12" onclick="delUser()">删除</button>
                 </td>
             </tr>
         </tbody>
     </table>
-    
-
-
-    
 </div>
-<script type="text/javascript" src="js/user-list.js"></script>
+<script type="text/javascript">
+
+    // let token = $.cookie("lhDream_token");
+    // if(null == token || "" == token || undefined == token){
+    //     window.location.href = "login.html"
+    // }
+
+    function resetUserList(){
+        //获取用户列表
+        $.post("userList", {
+            token: $.cookie("lhDream_token"),
+            username: $.cookie("lhDream_token_user")
+        },function (data,status){
+            if("success" == status){
+                data = $.parseJSON(data);
+                if("success" == data.res){
+                    $("#userList").children().remove();
+                    let userList = $.parseJSON(data.data);;
+                    $.each(userList, function (n, value) {
+                        $("#userList").append("<tr>" +
+                            "<td align=\"center\"><input type=\"checkbox\" name=\"checkbox\" jename=\"chunk\"></td>" +
+                            "<td>"+ n +"</td>" +
+                            "<td>"+ value.name +"</td>" +
+                            "<td>"+ value.uuid +"</td>" +
+                            "<td>"+ (value.state == 1 ? "在线":"离线") +"</td>" +
+                            "<td>---</td>" +
+                            "<td>---</td>" +
+                            "<td align=\"center\">" +
+                            "<button class=\"je-btn je-btn-mini je-f12\">编辑</button>" +
+                            "<button id='del"+n+"' class=\"je-btn je-btn-mini je-bg-red je-f12\" uuid = '"+value.uuid+"'>删除</button>" +
+                            "</td>");
+                        $("#del"+n).click(delUser);
+                    });
+                    jeBox.msg('刷新成功', {icon: 2,time:2});
+                }else{
+                    jeBox.msg('请求数据失败，请重新登录。', {icon: 3,time:2});
+                }
+            }
+        });
+    }
+
+    function delUser(){
+        //删除玩家数据
+        let uuid = $(this).attr("uuid");
+        jeBox({
+            cell:"jbx",
+            title:"确认删除该玩家",
+            boxSize:["400px","150px"],
+            padding:"0",
+            content:'<p style="text-align: center;padding: 0;margin-top: 25px">删除后将完全清除该玩家所有数据！</p>',
+            maskLock : true ,
+            btnAlign:"center",
+            button:[
+                {
+                    name: '取消'
+                },
+                {
+                    name: '确定',
+                    callback: function(index){
+                        $.post("playerController", {
+                            token: $.cookie("lhDream_token"),
+                            username: $.cookie("lhDream_token_user"),
+                            playerUUID: uuid
+                        },function (data,status){
+                            if("success" == status) {
+                                data = $.parseJSON(data);
+                                if ("success" == data.res) {
+                                    //删除成功刷新列表
+                                    resetUserList();
+                                }else{
+                                    jeBox.msg(uuid + "删除失败",{icon: 3,time:2})
+                                }
+                            }
+                        });
+                        jeBox.close(index);
+                    }
+
+                }
+            ]
+        });
+    }
+
+    //刷新用户列表
+    $("#reset").click(resetUserList);
+    resetUserList();
+    jeui.use(["jquery","jquery.jebox","jeDate","jeCheck","../jquery.cookie.min"],function () {
+        var start = {
+            format: 'YYYY-MM-DD hh:mm:ss',
+            minDate: '2014-06-16 23:59:59', //设定最小日期为当前日期
+            isinitVal:true,
+            //festival:true,
+            ishmsVal:false,
+            maxDate: $.nowDate({DD:0}), //最大日期
+            choosefun: function(elem, val, date){
+                end.minDate = date; //开始日选好后，重置结束日的最小日期
+                endDates();
+            }
+        };
+        var end = {
+            format: 'YYYY-MM-DD hh:mm:ss',
+            minDate: $.nowDate({DD:0}), //设定最小日期为当前日期
+            //festival:true,
+            maxDate: '2099-06-16 23:59:59', //最大日期
+            choosefun: function(elem, val, date){
+                start.maxDate = date; //将结束日的初始值设定为开始日的最大日期
+            }
+        };
+        //这里是日期联动的关键
+        function endDates() {
+            //将结束日期的事件改成 false 即可
+            end.trigger = false;
+            $("#inpend").jeDate(end);
+        }
+        $('#inpstart').jeDate(start);
+        $('#inpend').jeDate(end);
+        $("#newCheck").jeCheck({
+            jename:"chunk",
+            attrName:[false,"勾选"],
+            itemfun: function(elem,bool) {
+                console.log(bool)
+                //console.log(elem.prop('checked'))
+            },
+            success:function(elem){
+                jeui.chunkSelect(elem,'#gocheck','on')
+
+            }
+        })
+    });
+</script>
 </body>
 </html>

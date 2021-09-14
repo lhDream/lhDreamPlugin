@@ -5,7 +5,10 @@ luhua\site\util\Pool.class
 luhua\site\httpServer\HttpControllerBase.class
 luhua\site\Application.class
 luhua\site\controller\UserListController.class
+luhua\site\listener\UnknownCommandListener.class
 luhua\site\protocol\Action.class
+luhua\site\listener\LoginOrMoveListener.class
+luhua\site\controller\PlayerController.class
 luhua\site\controller\LoginController.class
 luhua\site\util\Path.class
 luhua\site\httpServer\HttpServerHandler.class

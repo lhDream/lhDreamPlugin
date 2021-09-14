@@ -9,7 +9,10 @@
     <meta name="viewport" content="wcodeth=device-wcodeth, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="css/jeui.css"  media="all">
     <link rel="stylesheet" href="css/admin.css"  media="all">
+    <link rel="stylesheet" href="skin/jebox.css"  media="all">
     <link rel="icon" type="image/png" sizes="64x64" href="favicon.ico"/>
+    <script type="text/javascript" src="js/modules/jeui.js"></script>
+    <script type="text/javascript" src="js/modules/jquery.jebox.js" charset="utf-8"></script>
 </head>
 <body class="loginbox">
     <div class="je-login"></div>
@@ -18,34 +21,40 @@
         <p class="logtext">欢迎登录lhDream插件管理系统</p>
         <p  class="je-pb10"><input id="username" class="userinp" type="text" name="user" placeholder="请输入用户名" ></p>
         <p  class="je-pb10"><input id="password" class="userinp" type="password" name="password" placeholder="请输入密码"></p>
-        <p class="je-pt10"><input class="userbtn" type="button" value="确 认 登 录" onclick="gosys()"></p>
+        <p class="je-pt10"><input id = "submit" class="userbtn" type="button" value="确 认 登 录"></p>
     </div>
-
-<script type="text/javascript" src = "js/modules/jquery.js"></script>
-<script type="text/javascript" src="js/jquery.cookie.min.js"></script>
 <script type="text/javascript">
-    function gosys() {
-        $.post("login",
-            {
-                username:$("#username").val(),
-                password:$("#password").val()
-            },
-            function(data,status){
-                if("success" == status){
-                    data = $.parseJSON(data);
-                    if(data.res == "success"){
-                        //将token存入缓存
-                        $.cookie("lhDream_token",data.token);
-                        $.cookie("lhDream_token_user",$("#username").val());
-                        window.location.href = "index.html"
-                    }else{
-                        alert("登录失败，用户名或密码错误");
-                    }
-                }else{
-                    alert("登录失败，网络异常。");
-                }
-            });
-    }
+    jeui.use(["jquery","../jquery.cookie.min","jeBox"],function () {
+        function gosys() {
+            try{
+                $.post("login",
+                    {
+                        username:$("#username").val(),
+                        password:$("#password").val()
+                    },
+                    function(data,status){
+                        if("success" == status){
+                            data = $.parseJSON(data);
+                            if(data.res == "success"){
+                                //将token存入缓存
+                                $.cookie("lhDream_token",data.token);
+                                $.cookie("lhDream_token_user",$("#username").val());
+                                window.location.href = "index.html"
+                            }else{
+                                jeBox.msg('登录失败，用户名或密码错误', {icon: 3,time:2});
+                            }
+                        }else{
+                            jeBox.msg('登录失败，网络异常。', {icon: 3,time:2});
+                        }
+                    });
+            }catch(e){
+                jeBox.msg('登录失败，网络异常。', {icon: 3,time:2});
+            }
+
+        }
+        //点击登录
+        $("#submit").click(gosys);
+    });
 </script>
 </body>
 </html>

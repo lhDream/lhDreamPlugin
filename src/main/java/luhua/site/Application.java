@@ -7,12 +7,15 @@ import luhua.site.controller.PluginsController;
 import luhua.site.controller.UserListController;
 import luhua.site.httpServer.HttpLhDreamRequestMap;
 import luhua.site.httpServer.NettyServerHttp;
+import luhua.site.listener.LoginOrMoveListener;
+import luhua.site.listener.UnknownCommandListener;
 import luhua.site.protocol.Action;
 import luhua.site.util.ConfigReader;
 import luhua.site.util.Pool;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 
@@ -55,9 +58,11 @@ public final class Application extends JavaPlugin {
         log.info("初始化配置");
         FileConfiguration config = this.getConfig();
         this.saveDefaultConfig();
+        //初始化http服务
         this.initHttp();
-
-
+        //初始化监听器
+        initListener();
+        //初始化指令
         PluginCommand command = this.getCommand("hello");
         command.setExecutor(new Action());
     }
@@ -83,6 +88,16 @@ public final class Application extends JavaPlugin {
      */
     public static Logger getLog(){
         return log;
+    }
+
+    /**
+     * 初始化监听器
+     */
+    private void initListener(){
+        PluginManager pluginManager = this.getServer().getPluginManager();
+        pluginManager.registerEvents(new UnknownCommandListener(),this);
+        pluginManager.registerEvents(new LoginOrMoveListener(),this);
+
     }
 
     /**

@@ -9,9 +9,10 @@
     <meta name="viewport" content="wcodeth=device-wcodeth, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="css/jeui.css"  media="all">
     <link rel="stylesheet" href="css/admin.css"  media="all">
+    <link rel="stylesheet" href="skin/jebox.css"  media="all">
     <link rel="icon" type="image/png" sizes="64x64" href="favicon.ico"/>
     <script type="text/javascript" src="js/modules/jeui.js"></script>
-    <script type="text/javascript" src="js/modules/jeBox.js"></script>
+    <script type="text/javascript" src="js/modules/jquery.jebox.js" charset="utf-8"></script>
 </head>
 <body class="loginbox">
     <div class="je-login"></div>
@@ -24,18 +25,7 @@
     </div>
 <script type="text/javascript">
     jeui.use(["jquery","../jquery.cookie.min","jeBox"],function () {
-        jeBox.msg('登录失败，网络异常。', {icon: 3,time:2});
-        jeBox({
-            boxSize:["400px","240px"],
-            content:'<div style="padding:20px;">即直接给content传入html字符<br>当内容宽高超过定义宽高，会自动出现滚动条。<br><br><br><br><br><br><br><br><br><br><br>很高兴在下面遇见你</div>',
-            maskLock : true
-        })
         function gosys() {
-            jeui.use(["jquery","../jquery.cookie.min","jeBox"],function () {
-                jeBox.msg('登录失败，网络异常。', {icon: 3,time:2});
-            });
-
-
             try{
                 $.post("login",
                     {
