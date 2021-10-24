@@ -13,6 +13,8 @@ import luhua.site.httpServer.HttpControllerBase;
 import org.bukkit.entity.Player;
 import org.slf4j.Logger;
 
+import java.io.File;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -39,19 +41,48 @@ public class PlayerController implements HttpControllerBase {
             return response;
         }
         String uuid = param.get("uuid").get(0);
-        log.info("删除用户:{}" ,uuid);
+        String name = param.get("name").get(0);
+        log.info("删除用户,uuid: {}, name:{}" ,uuid,name);
+        delUser(uuid,name);
 
-        Player player = Application.getApplication().getServer().getPlayer(uuid);
-        if(null != player){
-            player.remove();
-        }
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("res","error");
-        jsonObject.addProperty("error","NOT_FIND_TOKEN");
+        jsonObject.addProperty("res","success");
+        jsonObject.addProperty("desc","删除成功");
         DefaultFullHttpResponse defaultFullHttpResponse =
                 new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
                         HttpResponseStatus.OK,
                         Unpooled.copiedBuffer(jsonObject.toString(), CharsetUtil.UTF_8));
         return defaultFullHttpResponse;
     }
+
+    /**
+     * 删除用户所有数据
+     * @param uuid
+     */
+    public void delUser(String... uuid){
+        //主世界文件夹名称
+        String worldName = Application.getApplication().getServer().getWorlds().get(0).getName();
+        File file = new File(worldName+"/playerdata");
+        if(null != file){
+            File[] files = file.listFiles();
+            for(File f:files){
+                if(null != f && f.getName().indexOf(uuid[0])> -1){
+                    //删除用户数据
+                    f.delete();
+                }
+            }
+        }
+        file = new File(worldName+"/advancements");
+        if(null != file){
+            File[] files = file.listFiles();
+            for(File f:files){
+                if(null != f && f.getName().indexOf(uuid[0])> -1){
+                    //删除用户数据
+                    f.delete();
+                }
+            }
+        }
+    }
+
+
 }

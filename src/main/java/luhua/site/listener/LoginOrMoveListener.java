@@ -16,7 +16,7 @@ public class LoginOrMoveListener implements Listener {
     private Logger log ;
 
     public LoginOrMoveListener(){
-        Application.getLog();
+        log = Application.getLog();
     }
 
     /**
@@ -32,17 +32,17 @@ public class LoginOrMoveListener implements Listener {
 
     }
 
-    /**
-     * 玩家离线
-     * @param event
-     */
-    @EventHandler
-    public void onLogin(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        if(null != player){
-            log.info("玩家 {} 离线了",player.getName());
-        }
-    }
+//    /**
+//     * 玩家离线
+//     * @param event
+//     */
+//    @EventHandler
+//    public void onLogin(Player event) {
+//        Player player = event.getPlayer();
+//        if(null != player){
+//            log.info("玩家 {} 离线了",player.getName());
+//        }
+//    }
 
 
 }

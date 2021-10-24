@@ -109,6 +109,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                     Map<String,List<String>> map = new HashMap<>();
                     List<InterfaceHttpData> bodyHttpDatas = decoder.getBodyHttpDatas();
                     if(null != bodyHttpDatas){
+                        final String url = uri;
                         bodyHttpDatas.forEach(e->{
                             if(null == e){
                                 return;
@@ -125,6 +126,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                                     strings.add(attribute.getValue());
                                 } catch (IOException ioException) {
                                     ioException.printStackTrace();
+                                    log.error("ip:{},请求时传递了非法参数:{},请求地址:{}",
+                                            ctx.channel().remoteAddress().toString(),
+                                            bodyHttpDatas.toString(),
+                                            url);
                                     log.error(ioException.toString());
                                 }
                             }
@@ -139,7 +144,10 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                     ctx.close();
                 }
             }else{
-                log.info("不支持的请求方式");
+                log.error("ip:{},进行了不支持的请求方式:{},请求地址:{}",
+                        ctx.channel().remoteAddress().toString(),
+                        msg.method().toString(),
+                        uri);
                 DefaultFullHttpResponse defaultFullHttpResponse =
                         new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
                                 HttpResponseStatus.INTERNAL_SERVER_ERROR);

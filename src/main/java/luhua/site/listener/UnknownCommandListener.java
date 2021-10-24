@@ -15,7 +15,7 @@ public class UnknownCommandListener implements Listener {
      */
     @EventHandler
     public void UnknownCommand(UnknownCommandEvent UnknownCommandEvent){
-        UnknownCommandEvent.getSender().sendMessage("你在尝试什么?");
+        UnknownCommandEvent.getSender().sendMessage("指令输入错误,不会使用指令的话，尝试输入/help来获取帮助!");
     }
 
 }

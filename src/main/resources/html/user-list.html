@@ -94,6 +94,7 @@
                             "<button class=\"je-btn je-btn-mini je-f12\">编辑</button>" +
                             "<button id='del"+n+"' class=\"je-btn je-btn-mini je-bg-red je-f12\" uuid = '"+value.uuid+"'>删除</button>" +
                             "</td>");
+                        $("#del"+n).attr("name",value.name)
                         $("#del"+n).click(delUser);
                     });
                     jeBox.msg('刷新成功', {icon: 2,time:2});
@@ -107,6 +108,7 @@
     function delUser(){
         //删除玩家数据
         let uuid = $(this).attr("uuid");
+        let name = $(this).attr("name");
         jeBox({
             cell:"jbx",
             title:"确认删除该玩家",
@@ -125,13 +127,16 @@
                         $.post("playerController", {
                             token: $.cookie("lhDream_token"),
                             username: $.cookie("lhDream_token_user"),
-                            playerUUID: uuid
+                            uuid: uuid,
+                            name:name
                         },function (data,status){
                             if("success" == status) {
                                 data = $.parseJSON(data);
                                 if ("success" == data.res) {
                                     //删除成功刷新列表
                                     resetUserList();
+                                }else if("error" == data.res && "NOT_FIND_TOKEN" == data.error){
+                                    jeBox.msg("登录超时重新登录",{icon: 3,time:2})
                                 }else{
                                     jeBox.msg(uuid + "删除失败",{icon: 3,time:2})
                                 }

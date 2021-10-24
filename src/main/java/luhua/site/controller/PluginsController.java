@@ -12,6 +12,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -25,6 +26,8 @@ import java.util.Map;
  **/
 public class PluginsController implements HttpControllerBase {
 
+    private Logger log = Application.getLog();
+
     @Override
     public DefaultFullHttpResponse httpRequest(ChannelHandlerContext ctx, FullHttpRequest req, DefaultFullHttpResponse resp, Map<String, List<String>> param) {
         byte[] b;
@@ -33,17 +36,9 @@ public class PluginsController implements HttpControllerBase {
         sb.append("<div>服务器插件列表：</div>");
         for(Plugin p:plugins){
             sb.append("<div>").append(p.getName()).append("</div>");
+            log.info("配置:{}",p.getConfig().saveToString());
         }
-        sb.append("<div>在线玩家列表：</div>");
-        Collection<? extends Player> players = Application.getApplication().getServer().getOnlinePlayers();
-        players.forEach(e->{
-            sb.append("<div>").append(e.getName()).append("</div>");
-        });
-        sb.append("<div>离线玩家列表：</div>");
-        @NotNull OfflinePlayer[] offlinePlayers = Application.getApplication().getServer().getOfflinePlayers();
-        for(OfflinePlayer offp:offlinePlayers){
-            sb.append("<div>").append(offp.getName()).append("</div>");
-        }
+
 
         b = sb.toString().getBytes(StandardCharsets.UTF_8);
         DefaultFullHttpResponse defaultFullHttpResponse =
