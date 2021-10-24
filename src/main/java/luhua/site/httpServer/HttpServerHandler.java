@@ -116,7 +116,6 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                             }
                             if (e.getHttpDataType() == InterfaceHttpData.HttpDataType.Attribute) {
                                 Attribute attribute = (Attribute) e;
-                                String question = null;
                                 try {
                                     List<String> strings = map.get(e.getName());
                                     if(strings == null){
@@ -240,7 +239,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                 ctx.close();
             }
         }catch(Exception e){
-            log.error("http requets error,{}",e.getLocalizedMessage());
+            log.error("http req err,path: {},ip: {}, error msg: {},",filename,ctx.channel().remoteAddress().toString(),e.getLocalizedMessage());
             DefaultFullHttpResponse defaultFullHttpResponse =
                     new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,
                             HttpResponseStatus.NOT_FOUND);
